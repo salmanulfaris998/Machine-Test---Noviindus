@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:interview/features/home%20screen/data/controller/category_controller.dart';
 import 'package:interview/features/home%20screen/widgets/category_chip.dart';
 import 'package:interview/features/home%20screen/widgets/featured_post_card.dart';
 import 'package:interview/features/home%20screen/widgets/header_greeting.dart';
@@ -52,17 +53,64 @@ class HomeScreen extends ConsumerWidget {
               // Category Chips
               SizedBox(
                 height: 48,
-                child: ListView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  children: const [
-                    CategoryChip(label: 'Explore', isActive: true),
-                    CategoryChip(label: 'Trending'),
-                    CategoryChip(label: 'All Categories'),
-                    CategoryChip(label: 'Physics'),
-                    CategoryChip(label: 'Chemistry'),
-                  ],
+                child: Consumer(
+                  builder: (context, ref, _) {
+                    final categoriesAsync = ref.watch(categoryControllerProvider);
+                    return categoriesAsync.when(
+                      loading: () => ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: 4,
+                        itemBuilder: (context, index) => Container(
+                          width: 96,
+                          margin: EdgeInsets.only(right: index == 3 ? 0 : 12),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                      ),
+                      error: (error, stack) => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.error_outline, color: Colors.redAccent),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Failed to load categories',
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.8),
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                ref.read(categoryControllerProvider.notifier).loadCategories();
+                              },
+                              icon: const Icon(Icons.refresh, color: Colors.white70),
+                            ),
+                          ],
+                        ),
+                      ),
+                      data: (categories) => ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: categories.length,
+                        itemBuilder: (context, index) {
+                          final category = categories[index];
+                          return Padding(
+                            padding: EdgeInsets.only(right: index == categories.length - 1 ? 0 : 12),
+                            child: CategoryChip(
+                              label: category.title,
+                              isActive: index == 0,
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
                 ),
               ),
 
