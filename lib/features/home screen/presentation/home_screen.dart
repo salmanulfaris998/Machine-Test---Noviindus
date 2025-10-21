@@ -11,6 +11,7 @@ import 'package:interview/features/home%20screen/data/controller/home_feed_contr
 import 'package:interview/features/home%20screen/widgets/category_chip.dart';
 import 'package:interview/features/home%20screen/widgets/video_feed_item.dart';
 import 'package:interview/features/home%20screen/widgets/header_greeting.dart';
+import 'package:interview/shared/storage_service.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -49,6 +50,49 @@ class HomeScreen extends ConsumerWidget {
                       'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=80',
                   onAvatarTap: () {
                     context.push('/my-feeds');
+                  },
+                  onLogoutTap: () async {
+                    // Show confirmation dialog
+                    final shouldLogout = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        backgroundColor: AppColors.surface,
+                        title: Text(
+                          'Logout',
+                          style: TextStyle(color: AppColors.textPrimary),
+                        ),
+                        content: Text(
+                          'Are you sure you want to logout?',
+                          style: TextStyle(color: AppColors.textSecondary),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(false),
+                            child: Text(
+                              AppStrings.cancel,
+                              style: TextStyle(color: AppColors.textSecondary),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(true),
+                            child: Text(
+                              'Logout',
+                              style: TextStyle(color: AppColors.primary),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+
+                    if (shouldLogout == true) {
+                      // Clear credentials
+                      await ref.read(storageServiceProvider).clearCredentials();
+                      
+                      if (context.mounted) {
+                        // Navigate to login screen
+                        context.go('/login');
+                      }
+                    }
                   },
                 ),
               ),

@@ -77,88 +77,112 @@ class _MyFeedsScreenState extends ConsumerState<MyFeedsScreen> {
               color: AppColors.primary,
             ),
           ),
-          error: (error, stack) => Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  size: AppSizes.iconXL * 1.3,
-                  color: AppColors.white50,
-                ),
-                const SizedBox(height: AppSizes.paddingMD),
-                Text(
-                  AppStrings.failedToLoadFeed,
-                  style: TextStyle(
-                    color: AppColors.white80,
-                    fontSize: AppSizes.fontLG,
+          error: (error, stack) => LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          size: AppSizes.iconXL * 1.3,
+                          color: AppColors.white50,
+                        ),
+                        const SizedBox(height: AppSizes.paddingMD),
+                        Text(
+                          AppStrings.failedToLoadFeed,
+                          style: TextStyle(
+                            color: AppColors.white80,
+                            fontSize: AppSizes.fontLG,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          error.toString(),
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.5),
+                            fontSize: 12,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: () {
+                            ref.read(myFeedControllerProvider.notifier).loadFeeds(refresh: true);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                          ),
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  error.toString(),
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.5),
-                    fontSize: 12,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: () {
-                    ref.read(myFeedControllerProvider.notifier).loadFeeds(refresh: true);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                  ),
-                  child: const Text('Retry'),
-                ),
-              ],
-            ),
+              );
+            },
           ),
           data: (state) {
             if (state.feeds.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.video_library_outlined,
-                      size: AppSizes.iconXL * 1.3,
-                      color: AppColors.white30,
-                    ),
-                    const SizedBox(height: AppSizes.paddingMD),
-                    Text(
-                      AppStrings.noFeedsYet,
-                      style: TextStyle(
-                        color: AppColors.white80,
-                        fontSize: AppSizes.fontXL,
-                        fontWeight: FontWeight.w600,
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
                       ),
-                    ),
-                    const SizedBox(height: AppSizes.paddingSM),
-                    Text(
-                      AppStrings.startSharingVideos,
-                      style: TextStyle(
-                        color: AppColors.white50,
-                        fontSize: AppSizes.fontMD,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    ElevatedButton.icon(
-                      onPressed: () => context.push('/add-feed'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.video_library_outlined,
+                              size: AppSizes.iconXL * 1.3,
+                              color: AppColors.white30,
+                            ),
+                            const SizedBox(height: AppSizes.paddingMD),
+                            Text(
+                              AppStrings.noFeedsYet,
+                              style: TextStyle(
+                                color: AppColors.white80,
+                                fontSize: AppSizes.fontXL,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: AppSizes.paddingSM),
+                            Text(
+                              AppStrings.startSharingVideos,
+                              style: TextStyle(
+                                color: AppColors.white50,
+                                fontSize: AppSizes.fontMD,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            ElevatedButton.icon(
+                              onPressed: () => context.push('/add-feed'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 12,
+                                ),
+                              ),
+                              icon: const Icon(Icons.add),
+                              label: Text(AppStrings.addYourFirstFeed),
+                            ),
+                          ],
                         ),
                       ),
-                      icon: const Icon(Icons.add),
-                      label: Text(AppStrings.addYourFirstFeed),
                     ),
-                  ],
-                ),
+                  );
+                },
               );
             }
 
