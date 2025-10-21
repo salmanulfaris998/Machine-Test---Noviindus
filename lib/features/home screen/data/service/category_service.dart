@@ -1,18 +1,17 @@
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
+import 'package:interview/core/constants/api_constants.dart';
 import 'package:interview/features/home screen/data/model/category_model.dart';
 
 class CategoryService {
   CategoryService({http.Client? client}) : _client = client ?? http.Client();
 
   final http.Client _client;
-  static const String _baseUrl = 'https://frijo.noviindus.in/api';
 
   Future<CategoryListResponse> fetchCategories() async {
-    final uri = Uri.parse('$_baseUrl/category_list');
-
+    final uri = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.categoryList}');
     final response = await _client.get(uri);
+    
     if (response.statusCode >= 200 && response.statusCode < 300) {
       final Map<String, dynamic> jsonBody =
           json.decode(response.body) as Map<String, dynamic>;

@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:interview/core/constants/app_colors.dart';
+import 'package:interview/core/constants/app_sizes.dart';
+import 'package:interview/core/constants/app_strings.dart';
+import 'package:interview/core/utils/date_time_utils.dart';
+import 'package:interview/core/utils/image_utils.dart';
 import 'package:interview/features/home%20screen/data/controller/category_controller.dart';
 import 'package:interview/features/home%20screen/data/controller/home_feed_controller.dart';
 import 'package:interview/features/home%20screen/widgets/category_chip.dart';
 import 'package:interview/features/home%20screen/widgets/video_feed_item.dart';
 import 'package:interview/features/home%20screen/widgets/header_greeting.dart';
-import 'package:interview/shared/storage_service.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -17,17 +21,17 @@ class HomeScreen extends ConsumerWidget {
     final feedState = ref.watch(homeFeedControllerProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF111111),
+      backgroundColor: AppColors.background,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: SizedBox(
         width: 76,
         height: 76,
         child: FloatingActionButton(
           onPressed: () => context.push('/add-feed'),
-          backgroundColor: const Color(0xFFE4090E),
+          backgroundColor: AppColors.primary,
           elevation: 0,
           shape: const CircleBorder(),
-          child: const Icon(Icons.add, size: 36, color: Colors.white),
+          child: Icon(Icons.add, size: AppSizes.iconLG, color: AppColors.textPrimary),
         ),
       ),
       body: SafeArea(
@@ -37,17 +41,14 @@ class HomeScreen extends ConsumerWidget {
             children: [
               Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                    const EdgeInsets.symmetric(horizontal: AppSizes.paddingLG, vertical: AppSizes.paddingLG),
                 child: HeaderGreeting(
-                  title: 'Hello Maria',
-                  subtitle: 'Welcome back to Section',
+                  title: AppStrings.helloUser,
+                  subtitle: AppStrings.welcomeBack,
                   avatarUrl:
                       'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=80',
-                  onAvatarTap: () async {
-                    await ref.read(storageServiceProvider).clearCredentials();
-                    if (context.mounted) {
-                      context.go('/login');
-                    }
+                  onAvatarTap: () {
+                    context.push('/my-feeds');
                   },
                 ),
               ),
@@ -55,12 +56,12 @@ class HomeScreen extends ConsumerWidget {
               const SizedBox(height: 24),
 
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                padding: const EdgeInsets.symmetric(horizontal: AppSizes.paddingLG),
                 child: Text(
-                  'Categories',
+                  AppStrings.categories,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
-                    fontSize: 18,
+                    color: AppColors.white90,
+                    fontSize: AppSizes.fontXL,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -135,12 +136,12 @@ class HomeScreen extends ConsumerWidget {
               const SizedBox(height: 28),
 
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                padding: const EdgeInsets.symmetric(horizontal: AppSizes.paddingLG),
                 child: Text(
-                  'Latest Posts',
+                  AppStrings.latestPosts,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
-                    fontSize: 18,
+                    color: AppColors.white90,
+                    fontSize: AppSizes.fontXL,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -207,17 +208,15 @@ class HomeScreen extends ConsumerWidget {
                       final avatarUrl = post.user.image?.trim();
                       final thumbnailUrl = post.image.trim();
                       final videoUrl = post.video.trim();
-                      final fallbackAvatar =
-                          'https://ui-avatars.com/api/?name=${Uri.encodeComponent(post.user.name)}';
-                      final fallbackThumbnail =
-                          'https://ui-avatars.com/api/?name=${Uri.encodeComponent(post.description)}&size=512&background=1F1F1F&color=FFFFFF';
+                      final fallbackAvatar = ImageUtils.getFallbackAvatar(post.user.name);
+                      final fallbackThumbnail = ImageUtils.getFallbackImage(post.description);
                       
                       return VideoFeedItem(
                         feedId: post.id,
                         authorName: post.user.name,
                         timeAgo: post.createdAt != null
-                            ? _timeAgo(post.createdAt!)
-                            : 'Just now',
+                            ? DateTimeUtils.timeAgo(post.createdAt!)
+                            : AppStrings.justNow,
                         authorAvatarUrl:
                             (avatarUrl != null && avatarUrl.isNotEmpty)
                                 ? avatarUrl
@@ -248,20 +247,5 @@ class HomeScreen extends ConsumerWidget {
         ),
       ),
     );
-  }
-}
-
-String _timeAgo(DateTime dateTime) {
-  final now = DateTime.now();
-  final difference = now.difference(dateTime);
-
-  if (difference.inDays >= 1) {
-    return '${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago';
-  } else if (difference.inHours >= 1) {
-    return '${difference.inHours} hour${difference.inHours > 1 ? 's' : ''} ago';
-  } else if (difference.inMinutes >= 1) {
-    return '${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''} ago';
-  } else {
-    return 'Just now';
   }
 }

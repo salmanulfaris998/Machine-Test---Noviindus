@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:interview/features/add%20video/presentation/add_video.dart';
 import 'package:interview/features/auth/presentation/login_screen.dart';
 import 'package:interview/features/home%20screen/presentation/home_screen.dart';
+import 'package:interview/features/my%20feeds%20/presentation/my_feeds_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -21,6 +22,11 @@ class AppRouter {
         path: '/add-feed',
         name: 'addFeed',
         builder: (context, state) => const AddFeedsScreen(),
+      ),
+      GoRoute(
+        path: '/my-feeds',
+        name: 'myFeeds',
+        builder: (context, state) => const MyFeedsScreen(),
       ),
     ],
   );
