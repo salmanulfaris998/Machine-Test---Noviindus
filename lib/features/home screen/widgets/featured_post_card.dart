@@ -36,7 +36,22 @@ class FeaturedPostCard extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 26,
-                    backgroundImage: NetworkImage(authorAvatarUrl),
+                    backgroundImage:
+                        authorAvatarUrl.trim().isNotEmpty
+                            ? NetworkImage(authorAvatarUrl)
+                            : null,
+                    backgroundColor: Colors.white.withOpacity(0.08),
+                    child: authorAvatarUrl.trim().isEmpty
+                        ? Text(
+                            authorName.isNotEmpty
+                                ? authorName.trim()[0].toUpperCase()
+                                : '?',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          )
+                        : null,
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -76,10 +91,14 @@ class FeaturedPostCard extends StatelessWidget {
                   children: [
                     AspectRatio(
                       aspectRatio: 16 / 10,
-                      child: Image.network(
-                        bannerImageUrl,
-                        fit: BoxFit.cover,
-                      ),
+                      child: bannerImageUrl.trim().isNotEmpty
+                          ? Image.network(
+                              bannerImageUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stack) =>
+                                  _buildFallbackBanner(authorName),
+                            )
+                          : _buildFallbackBanner(authorName),
                     ),
                     Positioned.fill(
                       child: DecoratedBox(
@@ -139,6 +158,32 @@ class FeaturedPostCard extends StatelessWidget {
           height: 32,
         ),
       ],
+    );
+  }
+
+  Widget _buildFallbackBanner(String title) {
+    return Container(
+      color: Colors.white.withOpacity(0.05),
+      alignment: Alignment.center,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.image_not_supported_outlined,
+            color: Colors.white54,
+            size: 40,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            title.isNotEmpty ? title : 'No preview available',
+            style: const TextStyle(
+              color: Colors.white70,
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }
