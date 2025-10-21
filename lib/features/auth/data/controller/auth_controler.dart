@@ -1,23 +1,31 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:interview/features/auth/data/models/otp_verify_request.dart';
-import 'package:interview/features/auth/data/models/otp_verify_response.dart';
+import 'package:interview/features/auth/data/models/otp_verified.dart';
 import 'package:interview/features/auth/data/service/auth_service.dart';
+import 'package:interview/shared/storage_service.dart';
 
 final authServiceProvider = Provider<AuthService>((ref) {
   return AuthService();
 });
 
 final otpVerifyControllerProvider =
-    StateNotifierProvider<OtpVerifyController, AsyncValue<OtpVerifyResponse?>>(
-  (ref) => OtpVerifyController(ref.read(authServiceProvider)),
+    StateNotifierProvider<OtpVerifyController, AsyncValue<OtpVerifiedResponse?>>(
+  (ref) => OtpVerifyController(
+    service: ref.read(authServiceProvider),
+    storage: ref.read(storageServiceProvider),
+  ),
 );
 
 class OtpVerifyController
-    extends StateNotifier<AsyncValue<OtpVerifyResponse?>> {
-  OtpVerifyController(this._service)
-      : super(const AsyncValue<OtpVerifyResponse?>.data(null));
+    extends StateNotifier<AsyncValue<OtpVerifiedResponse?>> {
+  OtpVerifyController({
+    required AuthService service,
+    required StorageService storage,
+  })  : _service = service,
+        _storage = storage,
+        super(const AsyncValue<OtpVerifiedResponse?>.data(null));
 
   final AuthService _service;
+  final StorageService _storage;
 
   Future<void> verifyPhone({
     required String countryCode,
@@ -27,7 +35,12 @@ class OtpVerifyController
 
     try {
       final response = await _service.verifyOtp(
-        OtpVerifyRequest(countryCode: countryCode, phone: phone),
+        OtpVerifiedRequest(countryCode: countryCode, phone: phone),
+      );
+      await _storage.saveCredentials(
+        accessToken: response.token.access,
+        refreshToken: response.token.refresh,
+        phone: response.phone,
       );
       state = AsyncValue.data(response);
     } on AuthException catch (e, stack) {

@@ -6,11 +6,13 @@ class HeaderGreeting extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.avatarUrl,
+    this.onAvatarTap,
   });
 
   final String title;
   final String subtitle;
   final String avatarUrl;
+  final VoidCallback? onAvatarTap;
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +44,12 @@ class HeaderGreeting extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 16),
-        CircleAvatar(
-          radius: 24,
-          backgroundImage: NetworkImage(avatarUrl),
+        GestureDetector(
+          onTap: onAvatarTap,
+          child: CircleAvatar(
+            radius: 24,
+            backgroundImage: NetworkImage(avatarUrl),
+          ),
         ),
       ],
     );

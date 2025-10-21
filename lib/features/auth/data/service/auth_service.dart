@@ -1,8 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:interview/features/auth/data/models/otp_verify_request.dart';
-import 'package:interview/features/auth/data/models/otp_verify_response.dart';
+import 'package:interview/features/auth/data/models/otp_verified.dart';
 
 class AuthService {
   AuthService({http.Client? client}) : _client = client ?? http.Client();
@@ -10,7 +9,7 @@ class AuthService {
   final http.Client _client;
   static const String _baseUrl = 'https://frijo.noviindus.in/api';
 
-  Future<OtpVerifyResponse> verifyOtp(OtpVerifyRequest request) async {
+  Future<OtpVerifiedResponse> verifyOtp(OtpVerifiedRequest request) async {
     final uri = Uri.parse('$_baseUrl/otp_verified');
 
     final response = await _client.post(
@@ -24,7 +23,7 @@ class AuthService {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       final Map<String, dynamic> jsonBody =
           json.decode(response.body) as Map<String, dynamic>;
-      return OtpVerifyResponse.fromJson(jsonBody);
+      return OtpVerifiedResponse.fromJson(jsonBody);
     }
 
     throw AuthException(

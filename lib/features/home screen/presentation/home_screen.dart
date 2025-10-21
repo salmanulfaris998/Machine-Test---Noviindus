@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interview/features/home%20screen/widgets/category_chip.dart';
 import 'package:interview/features/home%20screen/widgets/featured_post_card.dart';
 import 'package:interview/features/home%20screen/widgets/header_greeting.dart';
+import 'package:interview/shared/storage_service.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: const Color(0xFF111111),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
@@ -31,13 +33,19 @@ class HomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header Greeting with padding
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
                 child: HeaderGreeting(
                   title: 'Hello Maria',
                   subtitle: 'Welcome back to Section',
                   avatarUrl:
                       'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=80',
+                  onAvatarTap: () async {
+                    await ref.read(storageServiceProvider).clearCredentials();
+                    if (context.mounted) {
+                      context.go('/login');
+                    }
+                  },
                 ),
               ),
 
